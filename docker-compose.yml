@@ -2,13 +2,26 @@ version: '3'
 services:
   web:
     build: .
+    command: python -u reverse-proxy-service.py
     ports:
-     - "5000:5000"
-#  web1:
-#    build: .
-#    ports:
-#     - "5500:5000"
-#  web2:
-#    build: .
-#    ports:
-#     - "7000:5000"
+     - 5000
+    volumes:
+      - .:/reverse-proxy
+    links:
+     - db
+
+
+  db:
+    image: mongo:3.0.2
+    environment:
+      MONGODB_HOST: db
+
+
+  lb:
+    image: dockercloud/haproxy
+    ports:
+      - 80:80
+    links:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

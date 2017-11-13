@@ -2,6 +2,8 @@ from flask import Flask
 from flask_cors import CORS
 from flask import request
 from flask import Response
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 import requests
 import json
 from gevent.wsgi import WSGIServer # For better concurrent request handling
@@ -10,19 +12,39 @@ app = Flask(__name__)
 CORS(app)
 http_server = WSGIServer(('0.0.0.0', 5000), app)
 
+client = MongoClient(
+    'db',
+    27017)
+db = client.reverseproxydb
+
 
 '''
 Function to keep track of proxy request and slow proxies
 '''
 
 
-def update_count(proxy_url, response_time):
-    if proxy_url not in proxy_count:
-        proxy_count[proxy_url] = 1
+def update_count_db(proxy_url, response_time):
+    item = db.queries.find_one({"url":proxy_url})
+    if item is None:
+        db.queries.insert_one({
+            'url':proxy_url,
+            'count':1
+        })
     else:
-        proxy_count[proxy_url] = proxy_count[proxy_url] + 1
+        db.queries.update_one({
+            '_id':ObjectId(item['_id'])
+        }, {
+            '$set': {
+                'count':item['count']+1
+            }
+        }, upsert=False)
+
     if response_time > THRESHOLD:
-        slow_proxy[proxy_url] = response_time
+        db.slow_requests.insert_one({
+            'url': proxy_url,
+            'time': response_time
+        })
+
 
 '''
 Function to make the API call to nextbus
@@ -38,9 +60,17 @@ def proxy_request(config_url):
 
 @app.route('/api/v1/stats', methods=['GET'])
 def stats():
+    queries = {}
+    slow_requests = {}
+    query_items = db.queries.find()
+    slow_queries = db.slow_requests.find()
+    for item in query_items:
+        queries[item['url']] = item['count']
+    for item in slow_queries:
+        slow_requests[item['url']] = item['time']
     resp = {
-        'slow_requests': slow_proxy,
-        'queries': proxy_count
+        'slow_requests': slow_requests,
+        'queries': queries
     }
     return Response(json.dumps(resp), status=200, mimetype='application/json')
 
@@ -67,7 +97,7 @@ def config():
                 route = request.args.get('r')
                 config_url = config_url + '&a=' + agency_tag + '&r=' + route
             data, response_time = proxy_request(config_url)
-    update_count(config_url, response_time)
+    update_count_db(config_url, response_time)
     return data
 
 
@@ -108,7 +138,7 @@ def prediction():
         route = request.args.get('r')
         prediction_url = prediction_url+'&r='+route
         data, response_time = proxy_request(prediction_url)
-    update_count(prediction_url, response_time)
+    update_count_db(prediction_url, response_time)
     return data
 
 
@@ -131,7 +161,7 @@ def message():
         time = request.args.get('t')
         message_url = message_url+'&r='+route+'&t='+time
         data, response_time = proxy_request(message_url)
-    update_count(message_url, response_time)
+    update_count_db(message_url, response_time)
     return data
 
 
