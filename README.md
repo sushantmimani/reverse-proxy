@@ -48,6 +48,11 @@ across all docker containers`
 ` The -v option is to make sure that all volumes are freed once the service is stopped. 
 This helps avoid errors is starting up the mongodb container due to dangling volumes`
 
+## Error Handling
+`Checks are in place to ensure that only those request are sent to the NextBus server which contain all 
+required parameters. If a request is missing some of the required parameters, the service 
+returns an error message and does not make any request to the NextBus servers`
+
 ## Limitations
 
 In order to prevent some users from being able to download so much data that it would interfere with other users we have imposed restrictions on data usage. These limitations could change at any time. They currently are:
