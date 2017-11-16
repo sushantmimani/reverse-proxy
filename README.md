@@ -63,11 +63,14 @@ it would interfere with other users we have imposed restrictions on data usage. 
 *   Maximum number of predictions per stop for prediction commands: 5
 *   Maximum time-span for "vehicleLocations" command: 5min
 
+`For slow endpoints, the api/v1/stats endpoint returns only the latest occurence
+of the slow endpoint`
+
 
 ## Assumptions
 
 *   Threshold for slow endpoints is assumed to be .5 seconds. This means that any request that 
-takes more than .5 seconds is classified as a slow request.
+takes more than .5 seconds is classified as a slow endpoint.
 *   The user is aware of the NextBus API contracts listed here
 *       http://www.nextbus.com/xmlFeedDocs/NextBusXMLFeed.pdf
 
