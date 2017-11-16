@@ -6,7 +6,7 @@ prediction_blueprint = Blueprint('prediction', __name__)
 
 @prediction_blueprint.route('/api/v1/prediction', methods=['GET'])
 def prediction():
-    data = Response('Bad Request!', status=400, mimetype='text')
+    data = Response('Bad Request!Missing parameters', status=400, mimetype='text')
     command = request.args.get('command')
     agency_tag = request.args.get('a')
     if not command or not agency_tag:
@@ -39,6 +39,8 @@ def prediction():
         data, response_time = proxy_request(prediction_url)
     elif command == 'schedule':
         route = request.args.get('r')
+        if route is None:
+            return data
         prediction_url = prediction_url+'&r='+route
         data, response_time = proxy_request(prediction_url)
     update_count_db(prediction_url, response_time)
