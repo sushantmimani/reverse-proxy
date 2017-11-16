@@ -38,9 +38,8 @@ The API calls have been segregated into 3 high level groups. <br/>
                   
 `The reverse-proxy service is hosted on docker containers and is made scalable with the use of 
 docker-compose and a round-robin scheduling algorithm provided by the docker image dockercloud/haproxy.
-The load balance is linked to the service in the docker-compose.yml file. There is a databse container
-that is also associated with the service. It is used as a common data-store for api stats
-for requests made via all reverse-proxy docker containers`
+The load balancer is linked to the service in the docker-compose.yml file. There is a database container
+that is also associated with the service. It stores the stats for all requests made to NextBus`
 
 ## How to terminate
 
@@ -66,7 +65,7 @@ it would interfere with other users we have imposed restrictions on data usage. 
 
 ## Assumptions
 
-*   Threshold for slow requests is assumed to be .5 seconds. This means that any request that 
+*   Threshold for slow endpoints is assumed to be .5 seconds. This means that any request that 
 takes more than .5 seconds is classified as a slow request.
 *   The user is aware of the NextBus API contracts listed here
 *       http://www.nextbus.com/xmlFeedDocs/NextBusXMLFeed.pdf
