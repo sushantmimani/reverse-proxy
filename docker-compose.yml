@@ -2,7 +2,7 @@ version: '3'
 services:
   web:
     build: .
-    command: python -u reverse-proxy-service.py
+    command: python reverse-proxy-service.py
     ports:
      - 5000
     volumes:
