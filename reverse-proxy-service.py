@@ -8,6 +8,7 @@ from gevent.wsgi import WSGIServer  # For better concurrent request handling
 
 
 app = Flask(__name__)
+# Register all routes
 app.register_blueprint(config_blueprint)
 app.register_blueprint(stats_blueprint)
 app.register_blueprint(message_blueprint)

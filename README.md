@@ -25,7 +25,8 @@ The API calls have been segregated into 3 high level groups. <br/>
         
 *       prediction (/api/v1/prediction)
         The prediction endpoint supports 3 commands: predictions, predictionsForMultiStops and schedule
-        predictions: 
+        predictions: /api/v1/prediction?command=predictions&a=<agency_tag>&stopId=<stop id>, or
+                     /api/v1/prediction?command=predictions?command=predictions&a=<agency_tag>&stopId=<stop id>&routeTag=<route tag>
         predictionsForMultiStops: /api/v1/prediction?command=predictionsForMultiStops&a=<agency_tag>&stops=<stop_tag>&stops=<stop_tag> (User can specify multiple stops)
         schedule: /api/v1/prediction?command=schedule&a=<agency_tag>&r=<route_tag>
         

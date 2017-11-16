@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 from flask import Response
 
 BASE_URL = 'http://webservices.nextbus.com/service/publicXMLFeed?command='
-THRESHOLD = 0.25
+THRESHOLD = 0.5
 
 
 client = MongoClient(
