@@ -39,12 +39,12 @@ The API calls have been segregated into 3 high level groups. <br/>
 `The reverse-proxy service is hosted on docker containers and is made scalable with the use of 
 docker-compose and a round-robin scheduling algorithm provided by the docker image dockercloud/haproxy.
 The load balance is linked to the service in the docker-compose.yml file. There is a databse container
-that is also associated with the service. It is used as a common data-store of api requests made 
-across all docker containers`
+that is also associated with the service. It is used as a common data-store for api stats
+for requests made via all reverse-proxy docker containers`
 
 ## How to terminate
 
-` docker-compose down -v`
+` docker-compose down -v`<br/><br/>
 ` The -v option is to make sure that all volumes are freed once the service is stopped. 
 This helps avoid errors is starting up the mongodb container due to dangling volumes`
 
@@ -55,10 +55,19 @@ returns an error message and does not make any request to the NextBus servers`
 
 ## Limitations
 
-`In order to prevent some users from being able to download so much data that it would interfere with other users we have imposed restrictions on data usage. These limitations could change at any time. They currently are:`
+`In order to prevent some users from being able to download so much data that 
+it would interfere with other users we have imposed restrictions on data usage. These limitations could change at any time. They currently are:`
 *   Maximum characters per requester for all commands (IP address): 2MB/20sec
 *   Maximum routes per "routeConfig" command: 100
 *   Maximum stops per route for the "predictionsForMultiStops" command: 150
 *   Maximum number of predictions per stop for prediction commands: 5
-*   Maximum timespan for "vehicleLocations" command: 5min
+*   Maximum time-span for "vehicleLocations" command: 5min
+
+
+## Assumptions
+
+*   Threshold for slow requests is assumed to be .5 seconds. This means that any request that 
+takes more than .5 seconds is classified as a slow request.
+*   The user is aware of the NextBus API contracts listed here
+*       http://www.nextbus.com/xmlFeedDocs/NextBusXMLFeed.pdf
 
