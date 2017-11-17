@@ -20,5 +20,5 @@ CORS(APP)
 HTTP_SERVER = WSGIServer(('0.0.0.0', 5000), APP)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and __package__ is None:
     HTTP_SERVER.serve_forever()

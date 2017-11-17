@@ -27,6 +27,7 @@ def message():
         return data
     message_url = BASE_URL + command + '&a=' + agency_tag
     if command == 'messages':
+        # If no route is specified, get all messages
         if request.args.get('r'):
             routes = request.args.getlist('r')
             for route in routes:
@@ -34,12 +35,13 @@ def message():
         data, response_time = proxy_request(message_url)
     elif command == 'vehicleLocations':
         route = request.args.get('r')
-        if route is None:
-            return data
+        # If no route is specified, get vehicleLocations for all routes
+        if route is not None:
+            message_url = message_url + '&r=' + route
         time = request.args.get('t')
         if time is None:
             time = '0'
-        message_url = message_url+'&r='+route+'&t='+time
+        message_url = message_url+'&t='+time
         data, response_time = proxy_request(message_url)
     update_count_db(message_url, response_time)
     return data
