@@ -11,7 +11,7 @@ control_c()
 trap control_c SIGINT
 
 
-if python unit_tests.py ; then
+if pip install --user -r requirements1.txt && python unit_tests.py ; then
     docker-compose up
 else
     echo "Tests failed"
