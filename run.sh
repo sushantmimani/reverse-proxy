@@ -10,5 +10,11 @@ control_c()
 
 trap control_c SIGINT
 
-docker-compose up
+
+if python unit_tests.py ; then
+    docker-compose up
+else
+    echo "Tests failed"
+fi
+
 
