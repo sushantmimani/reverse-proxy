@@ -1,3 +1,7 @@
+"""
+Util functions for the reverse-proxy service
+"""
+
 from pymongo import MongoClient
 import requests
 from bson.objectid import ObjectId
@@ -5,26 +9,29 @@ from flask import Response
 
 BASE_URL = 'http://webservices.nextbus.com/service/publicXMLFeed?command='
 THRESHOLD = 0.5
+CLIENT = MongoClient('db', 27017)
+DB = CLIENT.reverseproxydb
 
 
-client = MongoClient(
-    'db',
-    27017)
-db = client.reverseproxydb
-'''
-Function to keep track of proxy request and slow proxies
-'''
+def extract_params(req):
+    """
+    Function to keep track of proxy request and slow proxies
+    """
+    return req.args.get('command'), req.args.get('a')
 
 
 def update_count_db(proxy_url, response_time):
-    item = db.queries.find_one({"url":proxy_url})
+    """
+    Function to keep track of proxy request and slow proxies
+    """
+    item = DB.queries.find_one({"url": proxy_url})
     if item is None:
-        db.queries.insert_one({
+        DB.queries.insert_one({
             'url':proxy_url,
             'count':1
         })
     else:
-        db.queries.update_one({
+        DB.queries.update_one({
             '_id':ObjectId(item['_id'])
         }, {
             '$set': {
@@ -33,20 +40,17 @@ def update_count_db(proxy_url, response_time):
         }, upsert=False)
 
     if response_time > THRESHOLD:
-        db.slow_requests.insert_one({
+        DB.slow_requests.insert_one({
             'url': proxy_url,
             'time': response_time
         })
 
 
-'''
-Function to make the API call to nextbus
-'''
-
-
 def proxy_request(config_url):
+    """
+    Function to make the API call to NextBus
+    """
     resp = requests.get(config_url)
     response_time = resp.elapsed.total_seconds()
     data = Response(resp, status=200, mimetype='application/xml')
     return data, response_time
-

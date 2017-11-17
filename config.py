@@ -1,12 +1,27 @@
+"""
+This module exposes an endpoint to proxy config commands to the
+NextBus service
+
+"""
+
 from flask import request, Response, Blueprint
 from utils import BASE_URL, proxy_request, update_count_db
 
-config_blueprint = Blueprint('config', __name__)
+CONFIG_BLUEPRINT = Blueprint('config', __name__)
 
 
-@config_blueprint.route('/api/v1/config', methods=['GET'])
+@CONFIG_BLUEPRINT.route('/api/v1/config', methods=['GET'])
+# The URL is created based on the type of command and other request params
 def config():
-    data = Response('Bad Request! Missing parameters', status=400, mimetype='text')
+    """
+    This function checks the command received.
+    Based on the command, it dynamically creates the URL and
+    makes a request to the NextBus service
+
+    """
+    data = Response('Bad Request! Missing parameters',
+                    status=400,
+                    mimetype='text')
     # Return an error if the request doesn't contain a command
     command = request.args.get('command')
     if not command:

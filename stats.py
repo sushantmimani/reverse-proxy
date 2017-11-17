@@ -1,22 +1,25 @@
-from flask import Response, Blueprint
-from pymongo import MongoClient
+"""
+This module exposes an endpoint to retrieve stats for the API requests
+"""
 import json
+from flask import Response, Blueprint
+from utils import DB
+
+STATS_BLUEPRINT = Blueprint('stats', __name__)
 
 
-stats_blueprint = Blueprint('stats', __name__)
-
-client = MongoClient(
-    'db',
-    27017)
-db = client.reverseproxydb
-
-
-@stats_blueprint.route('/api/v1/stats', methods=['GET'])
+@STATS_BLUEPRINT.route('/api/v1/stats', methods=['GET'])
 def stats():
+    """
+    This function returns the API stats
+
+    """
     queries = {}
     slow_requests = {}
-    query_items = db.queries.find()
-    slow_queries = db.slow_requests.find()
+    #  Retrieve items from MongoDB
+    query_items = DB.queries.find()
+    slow_queries = DB.slow_requests.find()
+    # Create a dict from the data retrieved
     for item in query_items:
         queries[item['url']] = item['count']
     for item in slow_queries:

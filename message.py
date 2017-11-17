@@ -1,14 +1,28 @@
+"""
+This module exposes an endpoint to proxy message commands to the
+NextBus service
+
+"""
+
 from flask import request, Response, Blueprint
-from utils import BASE_URL, proxy_request, update_count_db
+from utils import BASE_URL, proxy_request, update_count_db, extract_params
 
-message_blueprint = Blueprint('message', __name__)
+MESSAGE_BLUEPRINT = Blueprint('message', __name__)
 
 
-@message_blueprint.route('/api/v1/message', methods=['GET'])
+@MESSAGE_BLUEPRINT.route('/api/v1/message', methods=['GET'])
 def message():
-    data = Response('Bad Request!Missing Parameters', status=400, mimetype='text')
-    command = request.args.get('command')
-    agency_tag = request.args.get('a')
+    """
+       This function checks the command received.
+       Based on the command, it dynamically creates the URL and
+       makes a request to the NextBus service
+
+       """
+    data = Response('Bad Request!Missing Parameters',
+                    status=400,
+                    mimetype='text')
+    command, agency_tag = extract_params(request)
+    #    If the params do not contain command and agency_tag an error is returned
     if not command or not agency_tag:
         return data
     message_url = BASE_URL + command + '&a=' + agency_tag
