@@ -5,6 +5,7 @@ NextBus service
 """
 
 from flask import request, Response, Blueprint
+import requests
 from utils import BASE_URL, proxy_request, update_count_db
 
 CONFIG_BLUEPRINT = Blueprint('config', __name__)
